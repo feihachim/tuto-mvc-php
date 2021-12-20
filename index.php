@@ -1,6 +1,6 @@
 <?php
 
-require('./controller/controller.php');
+require('./controller/frontend.php');
 
 $action = filter_input(INPUT_GET, 'action', FILTER_DEFAULT);
 
