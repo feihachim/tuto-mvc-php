@@ -1,18 +1,65 @@
 <?php
 
-require('./model/frontend.php');
+use \OpenClassrooms\Blog\Model\PostManager;
+use \OpenClassrooms\Blog\Model\CommentManager;
+
+require_once('model/PostManager.php');
+require_once('model/CommentManager.php');
 
 function listPosts()
 {
-    $posts = getPosts();
+    $postManager = new PostManager();
+    $posts = $postManager->getPosts();
 
     require('./view/frontend/listPostsView.php');
 }
 
 function post()
 {
-    $post = getPost($_GET['id']);
-    $comments = getComments($_GET['id']);
+
+    $postManager = new PostManager();
+    $commentManager = new CommentManager();
+
+    $post = $postManager->getPost($_GET['id']);
+    $comments = $commentManager->getComments($_GET['id']);
 
     require('./view/frontend/postView.php');
+}
+
+function addComment($postId, $author, $comment)
+{
+
+    $commentManager = new CommentManager();
+
+    $affectedLines = $commentManager->postComment($postId, $author, $comment);
+
+    if ($affectedLines === false) {
+        throw new Exception("Impossible d'ajouter le commentaire !");
+    } else {
+        header('Location: index.php?action=post&id=' . $postId);
+    }
+}
+
+function comment()
+{
+
+    $commentManager = new CommentManager();
+
+    $comment = $commentManager->getComment($_GET['id']);
+
+    require('./view/frontend/commentView.php');
+}
+
+function updateComment($commentId, $postId, $comment)
+{
+
+    $commentManager = new CommentManager();
+
+    $affectedLines = $commentManager->putComment($commentId, $comment);
+
+    if (!$affectedLines) {
+        throw new Exception("Impossible de modifier le commentaire !");
+    } else {
+        header('Location: index.php?action=post&id=' . $postId);
+    }
 }
